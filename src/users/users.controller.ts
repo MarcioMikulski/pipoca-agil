@@ -1,4 +1,11 @@
-import { ConflictException, Body, Post, Get } from '@nestjs/common';
+import {
+  ConflictException,
+  Body,
+  Post,
+  Get,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 
 import { Controller } from '@nestjs/common';
@@ -22,5 +29,10 @@ export class UsersController {
       throw new ConflictException('Email already registered');
     }
     return await this.UsersService.create(createUserDto);
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: number) {
+    return await this.UsersService.delete(id);
   }
 }
