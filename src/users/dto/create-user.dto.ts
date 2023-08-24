@@ -1,5 +1,5 @@
-export class CreateUserDto {
+export interface CreateUserDto {
   nome: string;
+  sobreNome: string;
   email: string;
-  senha: string;
 }

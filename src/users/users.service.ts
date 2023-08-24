@@ -13,9 +13,19 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-  async findAll(): Promise<Array<User>> {
-    return await this.userRepository.find();
+  private userToCreateUserDto(user: User): CreateUserDto {
+    const { nome, sobreNome, email } = user;
+    return { nome, sobreNome, email }; // Retorna apenas as propriedades necessárias
   }
+
+  async findAll(): Promise<CreateUserDto[]> {
+    const users = await this.userRepository.find();
+    return users.map((user) => this.userToCreateUserDto(user));
+  }
+
+  /* async findAll(): Promise<Array<User>> {
+    return await this.userRepository.find();
+  } */
 
   async isEmailTaken(email: string): Promise<boolean> {
     const existingUser = await this.userRepository.findOne({
@@ -24,7 +34,7 @@ export class UsersService {
 
     return !!existingUser;
   }
-  async create(user: CreateUserDto): Promise<User> {
+  async create(user: User): Promise<User> {
     user.senha = await this.encrypt.encrypt(user.senha);
     return await this.userRepository.save(user);
   }
