@@ -14,7 +14,7 @@ import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
-  constructor(private UsersService: UsersService) {}
+  constructor(private UsersService: UsersService) { }
 
   /*  @Get()
   async getUsers() {
@@ -42,4 +42,11 @@ export class UsersController {
   async deleteUser(@Param('id') id: number) {
     return await this.UsersService.delete(id);
   }
+
+  @Post('/reset-password')
+  async resetPassword(@Body() email: any) {
+    return await this.UsersService.resetPassword(email.email);
+  }
+
+
 }

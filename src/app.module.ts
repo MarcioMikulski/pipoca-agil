@@ -6,7 +6,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { RecuperaEmailModule } from './email/recupera-email.module';
+import { EmailModule } from './email/email.module';
+
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { RecuperaEmailModule } from './email/recupera-email.module';
     }),
     UsersModule,
     AuthModule,
-    RecuperaEmailModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

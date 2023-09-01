@@ -26,6 +26,7 @@ export class AuthService {
     const userMatch = await this.encrypt.compare(payload.senha, user.senha);
     if (userMatch) {
       return {
+        nome: user.nome + ' ' + user.sobreNome,
         access_token: this.jwtService.sign({ email: payload.email }),
       };
     }
