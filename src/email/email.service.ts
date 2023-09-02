@@ -1,24 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { IMailProvider, IMessage } from './email.interface';
 
 @Injectable()
-export class EmailService {
+export class EmailService implements IMailProvider {
   private readonly mailerService: MailerService;
 
-  async sendEmail(
-    email: string,
-    corpo: string,
-    assunto: string,
-    template: string,
-  ) {
+  constructor(mailerService: MailerService) {
+    this.mailerService = mailerService;
+  }
+
+  async sendMail(message: IMessage): Promise<void> {
     await this.mailerService.sendMail({
-      to: email,
-      subject: assunto,
-      template: template,
-      context: {
-        corpo,
+      to: {
+        address: message.to.email,
+        name: message.to.name,
       },
+      from: {
+        address: message.from.email,
+        name: message.from.name,
+      },
+      subject: message.subject,
+      template: message.template,
+      context: message.context,
+      html: message.html,
     });
   }
 }

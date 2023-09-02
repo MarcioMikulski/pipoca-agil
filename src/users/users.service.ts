@@ -48,29 +48,32 @@ export class UsersService {
   async findOneByEmail(username: string): Promise<User> {
     return await this.userRepository.findOneBy({ email: username });
   }
+
   async resetPassword(email: string) {
     const user = await this.userRepository.findOne({ where: { email: email } });
-
-
-    /* console.log(user); */
     if (user) {
       const newPassword = Math.random().toString(36).slice(-8);
-      // Aqui você deve usar a nova senha de alguma forma, como atualizar no banco de dados
-      // ou enviar por e-mail para o usuário.
-
       user.senha = await this.encrypt.encrypt(user.senha);
       await this.userRepository.save(user);
 
-      await this.emailService.sendEmail(
-        email,
-        `Sua nova senha é ${newPassword}`,
-        'Recuperação de senha',
-        'reset-password',
-      );
+      await this.emailService.sendMail({
+        to: {
+          email: user.email,
+          name: user.nome,
+        },
+        from: {
+          email: 'pipocaagil@gmail.com',
+          name: 'Equipe Pipoca Ágil',
+        },
+        subject: 'Recuperação de senha',
+        template: './reset-password',
+        context: {
+          name: user.nome,
+          newPassword: newPassword,
+        },
+      });
     } else {
-      throw new Error('Usuário não encontrado');
+      throw new Error('Usuário não encontrado com esse email');
     }
   }
-
 }
-

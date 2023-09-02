@@ -14,7 +14,7 @@ import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
-  constructor(private UsersService: UsersService) { }
+  constructor(private UsersService: UsersService) {}
 
   /*  @Get()
   async getUsers() {
@@ -34,7 +34,7 @@ export class UsersController {
     if (emailTaken) {
       throw new ConflictException('Email already registered');
     }
-    const users = await this.UsersService.create(user);
+    await this.UsersService.create(user);
     return 'Conta criada com sucesso';
   }
 
@@ -44,9 +44,7 @@ export class UsersController {
   }
 
   @Post('/reset-password')
-  async resetPassword(@Body() email: any) {
-    return await this.UsersService.resetPassword(email.email);
+  async resetPassword(@Body() body: any) {
+    return await this.UsersService.resetPassword(body.email);
   }
-
-
 }
