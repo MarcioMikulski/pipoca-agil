@@ -16,11 +16,6 @@ import { User } from './entities/user.entity';
 export class UsersController {
   constructor(private UsersService: UsersService) {}
 
-  /*  @Get()
-  async getUsers() {
-    return await this.UsersService.findAll();
-  } */
-
   @Get()
   async getUsers(): Promise<CreateUserDto[]> {
     return this.UsersService.findAll();
@@ -41,10 +36,5 @@ export class UsersController {
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
     return await this.UsersService.delete(id);
-  }
-
-  @Post('/reset-password')
-  async resetPassword(@Body() body: any) {
-    return await this.UsersService.resetPassword(body.email);
   }
 }
