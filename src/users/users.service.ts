@@ -53,7 +53,7 @@ export class UsersService {
     const user = await this.userRepository.findOne({ where: { email: email } });
     if (user) {
       const newPassword = Math.random().toString(36).slice(-8);
-      user.senha = await this.encrypt.encrypt(user.senha);
+      user.senha = await this.encrypt.encrypt(newPassword);
       await this.userRepository.save(user);
 
       await this.emailService.sendMail({
@@ -62,7 +62,7 @@ export class UsersService {
           name: user.nome,
         },
         from: {
-          email: 'pipocaagil@gmail.com',
+          email: 'mikulski@solutionscloud.online',
           name: 'Equipe Pipoca Ágil',
         },
         subject: 'Recuperação de senha',

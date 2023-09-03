@@ -9,16 +9,18 @@ import { join } from 'path';
     MailerModule.forRootAsync({
       useFactory: async () => ({
         transport: {
-          host: 'sandbox.smtp.mailtrap.io',
-          port: 2525,
-          secure: false,
-          auth: {
-            user: '83ef480bfff8b8',
-            pass: '8b8e17a7263ca6',
+          host: 'smtp.hostinger.com',
+          port: 465,
+          secure: true,
+          secureConnection: false,
+          tls: {
+            ciphers: 'SSLv3',
           },
-        },
-        defaults: {
-          from: 'pipocaagil@gmail.com',
+          requireTLS: true,
+          auth: {
+            user: process.env.EMAIL_LOGIN,
+            pass: process.env.EMAIL_PASSWORD,
+          },
         },
         template: {
           dir: join(__dirname, './templates'),
@@ -27,7 +29,7 @@ import { join } from 'path';
             strict: false,
           },
         },
-        preview: true,
+        preview: false,
       }),
     }),
   ],
