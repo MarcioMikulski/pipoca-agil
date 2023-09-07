@@ -7,6 +7,7 @@ import {
   Delete,
   Request,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -15,12 +16,12 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { compareSync, hashSync } from 'bcrypt';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private UsersService: UsersService,
-    private UpdatePasswordDto: UpdatePasswordDto,
-    private CreateUserDto: CreateUserDto,
+
   ) { }
 
   @Get()
@@ -51,29 +52,17 @@ export class UsersController {
   async deleteUser(@Param('id') id: number) {
     return await this.UsersService.delete(id);
   }
-  /*   @Post('update-password')
-    async updatePassword(@Body() user: User) {
-      return await this.UsersService.updatePassword(User);
-    } */
+  /*   @Post('/change-password')
+    async updatePassword(@Body() user: UpdatePasswordDto, ) {
+    
+     
+    }*/
 
-  @Post('change-password')
-  async changePassword(
-    @Request() req,
-    @Body() updatePasswordDto: UpdatePasswordDto,
-  ): Promise<{ message: string }> {
-    const user: User = req.user;
-    const isPasswordValid = compareSync(
-      updatePasswordDto.senhaantiga,
-      user.senha, // Suponhamos que a senha esteja armazenada de forma segura usando bcrypt
-    );
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Senha antiga incorreta.');
-    }
+  @Post('/change-password/:id')
+  @UseGuards(AuthGuard)
+  async changePassword(@Body() updatePasswordDto: UpdatePasswordDto, @Param('id') id: number) {
+  await this.UsersService.updatePassword(id, updatePasswordDto.senhaantiga, updatePasswordDto.novasenha);
+    return 'Senha alterada com sucesso';
+}
 
-    const newPasswordHash = hashSync(updatePasswordDto.novasenha, 10); // Gere um novo hash de senha
-
-    await this.UsersService.updatePassword(user.senha, newPasswordHash);
-
-    return { message: 'Senha atualizada com sucesso.' };
-  }
 }

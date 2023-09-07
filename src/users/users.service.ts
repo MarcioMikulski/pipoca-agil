@@ -15,13 +15,12 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private emailService: EmailService,
-    private UpdateUserDto: UpdateUserDto,
-    private UpdatePasswordDto: UpdatePasswordDto,
+
   ) { }
 
   private userToCreateUserDto(user: User): CreateUserDto {
-    const { nome, sobreNome, email } = user;
-    return { nome, sobreNome, email }; // Retorna apenas as propriedades necessárias
+    const { nome, sobrenome, email } = user;
+    return { nome, sobrenome, email }; // Retorna apenas as propriedades necessárias
   }
 
   async findAll(): Promise<CreateUserDto[]> {
@@ -116,8 +115,8 @@ export class UsersService {
     
    } */
 
-  async updatePassword(senhaantiga: string, novasenha: string) {
-    const user = await this.userRepository.findOne({ where: { senha: senhaantiga } });
+  async updatePassword(id: number, senhaantiga: string, novasenha: string) {
+    const user = await this.userRepository.findOneBy({ id: id });
     if (user) {
       const newPassword = novasenha;
       user.senha = await this.encrypt.encrypt(newPassword);

@@ -1,5 +1,5 @@
 export interface CreateUserDto {
   nome: string;
-  sobreNome: string;
+  sobrenome: string;
   email: string;
 }
