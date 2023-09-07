@@ -9,7 +9,7 @@ export class User {
   nome: string;
 
   @Column()
-  sobreNome: string;
+  sobrenome: string;
 
   @Column()
   email: string;

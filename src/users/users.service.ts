@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Encrypt } from 'src/auth/encrypt';
 import { EmailService } from 'src/email/email.service';
+import { UpdateUserDto } from './dto/updateuser.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,16 +15,28 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private emailService: EmailService,
-  ) {}
+
+  ) { }
 
   private userToCreateUserDto(user: User): CreateUserDto {
-    const { nome, sobreNome, email } = user;
-    return { nome, sobreNome, email }; // Retorna apenas as propriedades necessárias
+    const { nome, sobrenome, email } = user;
+    return { nome, sobrenome, email }; // Retorna apenas as propriedades necessárias
   }
 
   async findAll(): Promise<CreateUserDto[]> {
     const users = await this.userRepository.find();
     return users.map((user) => this.userToCreateUserDto(user));
+  }
+
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+    return user;
+
   }
 
   /* async findAll(): Promise<Array<User>> {
@@ -76,4 +90,39 @@ export class UsersService {
       throw new Error('Usuário não encontrado com esse email');
     }
   }
+  /*  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+     const user = await this.userRepository.findOne({
+        where: { id },
+     });
+     user.nome = updateUserDto.nome;
+     user.sobreNome = updateUserDto.sobreNome;
+     user.email = updateUserDto.email;
+     user.senha = updateUserDto.senha;
+     return await this.userRepository.save(user);
+   } */
+
+  /*   async updatesenha(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+     const user = await this.userRepository.findOne({
+       where: { id },
+     });
+ 
+     user.senha = updateUserDto.senha;
+ 
+     
+ 
+     return await this.userRepository.save(user);
+ 
+    
+   } */
+
+  async updatePassword(id: number, senhaantiga: string, novasenha: string) {
+    const user = await this.userRepository.findOneBy({ id: id });
+    if (user) {
+      const newPassword = novasenha;
+      user.senha = await this.encrypt.encrypt(newPassword);
+      await this.userRepository.save(user);
+    }
+  }
+
+
 }

@@ -5,21 +5,36 @@ import {
   Get,
   Param,
   Delete,
+  Request,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 
 import { Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { compareSync, hashSync } from 'bcrypt';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private UsersService: UsersService) {}
+  constructor(private UsersService: UsersService,
+
+  ) { }
 
   @Get()
   async getUsers(): Promise<CreateUserDto[]> {
     return this.UsersService.findAll();
   }
+
+
+  @Get(':id')
+  async getUser(@Param('id') id: number): Promise<User> {
+    return this.UsersService.findOne(id);
+  }
+
 
   @Post()
   async createUser(@Body() user: User) {
@@ -37,4 +52,17 @@ export class UsersController {
   async deleteUser(@Param('id') id: number) {
     return await this.UsersService.delete(id);
   }
+  /*   @Post('/change-password')
+    async updatePassword(@Body() user: UpdatePasswordDto, ) {
+    
+     
+    }*/
+
+  @Post('/change-password/:id')
+  @UseGuards(AuthGuard)
+  async changePassword(@Body() updatePasswordDto: UpdatePasswordDto, @Param('id') id: number) {
+  await this.UsersService.updatePassword(id, updatePasswordDto.senhaantiga, updatePasswordDto.novasenha);
+    return 'Senha alterada com sucesso';
+}
+
 }
