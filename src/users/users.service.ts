@@ -2,10 +2,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { Encrypt } from 'src/auth/encrypt';
 import { EmailService } from 'src/email/email.service';
-import { UpdateUserDto } from './dto/updateuser.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { ResponseUserDto } from './dto/response-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
@@ -15,42 +15,41 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private emailService: EmailService,
+  ) {}
 
-  ) { }
-
-  private userToCreateUserDto(user: User): CreateUserDto {
-    const { nome, sobrenome, email, datanascimento } = user;
-    return { nome, sobrenome, email, datanascimento }; // Retorna apenas as propriedades necessárias
+  private convertToDTO(user: User): ResponseUserDto {
+    return {
+      id: user.id,
+      nome: user.nome,
+      sobrenome: user.sobrenome,
+      email: user.email,
+      datanascimento: user.datanascimento,
+    };
   }
 
-  async findAll(): Promise<CreateUserDto[]> {
+  async findAll(): Promise<ResponseUserDto[]> {
     const users = await this.userRepository.find();
-    return users.map((user) => this.userToCreateUserDto(user));
+    return users.map((user) => this.convertToDTO(user));
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: number): Promise<ResponseUserDto> {
     const user = await this.userRepository.findOne({
       where: { id },
     });
     if (!user) {
       throw new Error('Usuário não encontrado');
     }
-    return user;
-
+    return this.convertToDTO(user);
   }
-
-  /* async findAll(): Promise<Array<User>> {
-    return await this.userRepository.find();
-  } */
 
   async isEmailTaken(email: string): Promise<boolean> {
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
-
     return !!existingUser;
   }
-  async create(user: User): Promise<User> {
+
+  async create(user: CreateUserDto): Promise<CreateUserDto> {
     user.senha = await this.encrypt.encrypt(user.senha);
     return await this.userRepository.save(user);
   }
@@ -90,39 +89,18 @@ export class UsersService {
       throw new Error('Usuário não encontrado com esse email');
     }
   }
-  /*  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-     const user = await this.userRepository.findOne({
-        where: { id },
-     });
-     user.nome = updateUserDto.nome;
-     user.sobreNome = updateUserDto.sobreNome;
-     user.email = updateUserDto.email;
-     user.senha = updateUserDto.senha;
-     return await this.userRepository.save(user);
-   } */
 
-  /*   async updatesenha(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-     const user = await this.userRepository.findOne({
-       where: { id },
-     });
- 
-     user.senha = updateUserDto.senha;
- 
-     
- 
-     return await this.userRepository.save(user);
- 
-    
-   } */
-
-  async updatePassword(id: number, senhaantiga: string, novasenha: string) {
+  async updatePassword(id: number, body: UpdatePasswordDto) {
     const user = await this.userRepository.findOneBy({ id: id });
     if (user) {
-      const newPassword = novasenha;
-      user.senha = await this.encrypt.encrypt(newPassword);
-      await this.userRepository.save(user);
+      const isPasswordCorrect = await this.encrypt.compare(
+        body.senhaantiga,
+        user.senha,
+      );
+      if (isPasswordCorrect) {
+        user.senha = await this.encrypt.encrypt(body.novasenha);
+        await this.userRepository.save(user);
+      }
     }
   }
-
-
 }

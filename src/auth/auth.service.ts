@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Encrypt } from './encrypt';
+import { ResponseLoginDTO } from './dto/response-login.dto';
+import { RequestLoginDTO } from './dto/request-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(user: User) {
+  async login(user: RequestLoginDTO): Promise<ResponseLoginDTO> {
     const userFound = await this.usersService.findOneByEmail(user.email);
     if (!userFound) {
       throw new NotFoundException('User not found');
@@ -27,6 +28,7 @@ export class AuthService {
     }
     const payload = { email: userFound.email, sub: userFound.id };
     return {
+      id: userFound.id,
       nome: userFound.nome,
       access_token: this.jwtService.sign(payload),
     };
