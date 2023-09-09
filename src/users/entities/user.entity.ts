@@ -16,4 +16,7 @@ export class User {
 
   @Column()
   senha: string;
+
+  @Column()
+  datanascimento: Date;
 }
