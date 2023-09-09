@@ -74,7 +74,7 @@ export class UsersService {
         to: {
           email: user.email,
           name: user.nome,
-        }, 
+        },
         from: {
           email: 'mikulski@solutionscloud.online',
           name: 'Equipe Pipoca Ágil',
