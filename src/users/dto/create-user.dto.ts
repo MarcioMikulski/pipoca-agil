@@ -8,5 +8,7 @@ export class CreateUserDto {
   @ApiProperty()
   email: string;
   @ApiProperty()
+  senha: string;
+  @ApiProperty()
   datanascimento: Date;
 }
