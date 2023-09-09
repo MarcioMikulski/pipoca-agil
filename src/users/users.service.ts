@@ -19,8 +19,8 @@ export class UsersService {
   ) { }
 
   private userToCreateUserDto(user: User): CreateUserDto {
-    const { nome, sobrenome, email } = user;
-    return { nome, sobrenome, email }; // Retorna apenas as propriedades necessárias
+    const { nome, sobrenome, email, datanascimento } = user;
+    return { nome, sobrenome, email, datanascimento }; // Retorna apenas as propriedades necessárias
   }
 
   async findAll(): Promise<CreateUserDto[]> {
@@ -74,7 +74,7 @@ export class UsersService {
         to: {
           email: user.email,
           name: user.nome,
-        },
+        }, 
         from: {
           email: 'mikulski@solutionscloud.online',
           name: 'Equipe Pipoca Ágil',
