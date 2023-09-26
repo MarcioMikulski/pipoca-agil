@@ -7,7 +7,9 @@ import { AuthService } from './auth.service';
 import { Encrypt } from './encrypt';
 import { AuthController } from './auth.controller';
 import { UsersService } from 'src/users/users.service';
+import { UserGoogle } from './entities/google.entity';
 import { EmailService } from 'src/email/email.service';
+import { GoogleStrategy } from './google.strategy';
 
 @Module({
   imports: [
@@ -20,8 +22,10 @@ import { EmailService } from 'src/email/email.service';
       },
     }),
     Encrypt,
+
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService, EmailService],
+  providers: [AuthService, UsersService, EmailService, GoogleStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}
